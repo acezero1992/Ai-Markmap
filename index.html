@@ -1928,5 +1928,33 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
+<script>
+  // 自动配置 Cloudflare 模式
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      // 1. 找到输入框
+      const apiInput = document.querySelector('input[placeholder*="http"]') || document.querySelector('input[type="text"]');
+      const keyInput = document.querySelector('input[type="password"]') || document.querySelector('input[placeholder*="Key"]');
+      
+      // 2. 自动填入"假"信息，引导工具去请求 Cloudflare 的 Function
+      // 只要这里填了东西，工具就会以为已经配置好了
+      if (apiInput) {
+        // 让工具请求当前域名的根目录，我们的 function 就在 /v1/chat/completions
+        // 获取当前网址的根路径，例如 https://xxx.pages.dev
+        const currentOrigin = window.location.origin;
+        apiInput.value = currentOrigin; 
+        apiInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      if (keyInput) {
+        // 填个假 Key，因为真正的 Key 在 Cloudflare 后台，不需要前端传
+        keyInput.value = 'sk-cloudflare-proxy-auto'; 
+        keyInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      
+      console.log("已自动指向 Cloudflare 后端代理");
+    }, 1000); // 延迟1秒等待界面加载
+  });
+</script>
 </body>
 </html>
